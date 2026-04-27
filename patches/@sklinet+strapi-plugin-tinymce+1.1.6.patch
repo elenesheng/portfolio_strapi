@@ -1,0 +1,82 @@
+diff --git a/node_modules/@sklinet/strapi-plugin-tinymce/dist/_chunks/Wysiwyg-BSeJKRQ4.js b/node_modules/@sklinet/strapi-plugin-tinymce/dist/_chunks/Wysiwyg-BSeJKRQ4.js
+index 62f66fb..48814a7 100644
+--- a/node_modules/@sklinet/strapi-plugin-tinymce/dist/_chunks/Wysiwyg-BSeJKRQ4.js
++++ b/node_modules/@sklinet/strapi-plugin-tinymce/dist/_chunks/Wysiwyg-BSeJKRQ4.js
+@@ -20,11 +20,10 @@ const prefixFileUrlWithBackendUrl = (path, defaultDomain = "http://localhost:133
+   }
+ };
+ const TinyEditor = ({ onChange, name, value, disabled }) => {
+-  const { get } = admin.useFetchClient();
++  const { get, post } = admin.useFetchClient();
+   const [pluginConfig, setPluginConfig] = react.useState(null);
+   const [apiKey, setApiKey] = react.useState("");
+   const [loading, setLoading] = react.useState(true);
+-  const uploadUrl = prefixFileUrlWithBackendUrl("/api/upload", pluginConfig?.data?.defaultAdminDomain || "");
+   react.useEffect(() => {
+     const getApiKey = async () => {
+       const data = await settings.taskRequests.getSettings();
+@@ -58,16 +57,14 @@ const TinyEditor = ({ onChange, name, value, disabled }) => {
+         images_upload_handler: async (blobInfo) => {
+           const formData = new FormData();
+           formData.append("files", blobInfo.blob());
+-          const response = await fetch(uploadUrl, {
+-            method: "POST",
+-            headers: {
+-              Authorization: "Bearer "
+-            },
+-            body: formData
+-          }).then((response2) => response2.json()).catch(function(err) {
++          try {
++            const res = await post("/upload", formData);
++            const uploaded = res?.data;
++            return uploaded?.[0]?.url || "";
++          } catch (err) {
+             console.log("error:", err);
+-          });
+-          return response?.[0]?.url || "";
++            return "";
++          }
+         }
+       }
+     }
+diff --git a/node_modules/@sklinet/strapi-plugin-tinymce/dist/_chunks/Wysiwyg-DKKo1ZGa.mjs b/node_modules/@sklinet/strapi-plugin-tinymce/dist/_chunks/Wysiwyg-DKKo1ZGa.mjs
+index 8aa27e1..c87d0ab 100644
+--- a/node_modules/@sklinet/strapi-plugin-tinymce/dist/_chunks/Wysiwyg-DKKo1ZGa.mjs
++++ b/node_modules/@sklinet/strapi-plugin-tinymce/dist/_chunks/Wysiwyg-DKKo1ZGa.mjs
+@@ -18,11 +18,10 @@ const prefixFileUrlWithBackendUrl = (path, defaultDomain = "http://localhost:133
+   }
+ };
+ const TinyEditor = ({ onChange, name, value, disabled }) => {
+-  const { get } = useFetchClient();
++  const { get, post } = useFetchClient();
+   const [pluginConfig, setPluginConfig] = useState(null);
+   const [apiKey, setApiKey] = useState("");
+   const [loading, setLoading] = useState(true);
+-  const uploadUrl = prefixFileUrlWithBackendUrl("/api/upload", pluginConfig?.data?.defaultAdminDomain || "");
+   useEffect(() => {
+     const getApiKey = async () => {
+       const data = await taskRequests.getSettings();
+@@ -56,16 +55,14 @@ const TinyEditor = ({ onChange, name, value, disabled }) => {
+         images_upload_handler: async (blobInfo) => {
+           const formData = new FormData();
+           formData.append("files", blobInfo.blob());
+-          const response = await fetch(uploadUrl, {
+-            method: "POST",
+-            headers: {
+-              Authorization: "Bearer "
+-            },
+-            body: formData
+-          }).then((response2) => response2.json()).catch(function(err) {
++          try {
++            const res = await post("/upload", formData);
++            const uploaded = res?.data;
++            return uploaded?.[0]?.url || "";
++          } catch (err) {
+             console.log("error:", err);
+-          });
+-          return response?.[0]?.url || "";
++            return "";
++          }
+         }
+       }
+     }
